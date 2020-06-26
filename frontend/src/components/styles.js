@@ -48,7 +48,28 @@ export const Inputs = styled.input`
     border: none;
     background: #f1f1f1;
     border-radius: 3px;
-    margin-bottom: 10px;
+    height: 30px;
+    margin-top: 10px;
     padding: 6px;
     box-shadow: 0px 0px 2px 0px #bfbfbf;
+`;
+
+export const Forms = styled.form`
+    display: flex;
+    flex-direction: column;
+    margin: 30px;
+    max-width: 300px;
+    max-height: 300px;
+    min-height: 175px;
+    min-width: 300px;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+    box-shadow: rgb(138, 138, 138) 0px 0px 3px 0px;
+    background: rgb(251, 251, 251);
+    font-weight: bold;
+    font-size: 20px;
+    color: rgb(50, 42, 64);
+    text-decoration: none;
+    border-radius: 3px;
 `;

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ReactDom from 'react-dom';
 import { Link, useHistory } from 'react-router-dom';
 import { FiPower, FiArrowLeft } from 'react-icons/fi';
@@ -15,10 +15,13 @@ import SimpleLineChart from '../../components/Charts/SimpleLineChart';
 import TwoSimplePieChart from '../../components/Charts/TwoSimplePieChart';
 import SimpleBarChart from '../../components/Charts/SimpleBarChart';
 import Consulta from '../../components/Consulta/Consulta';
+import api from '../../services/api';
 
 export default function Screen(props) {
     const history = useHistory();
-    const prop = props.match.params;
+    const { id } = props.match.params;
+
+    const idUser = localStorage.getItem('idUser');
 
     const [ tableadd, setTableadd ] = useState('');
     const [ typeadd, setTypeadd ] = useState('');
@@ -27,7 +30,19 @@ export default function Screen(props) {
     const [ values, setValues ] = useState('');
     const [ title, setTitle ] = useState();
 
-    console.log(title);
+    const [ ctable, setCtable ] = useState([]);
+    const [ ccolumns , setCcolumns ] = useState([]);
+
+    const sets = [
+        tableadd,
+        typeadd,
+        model,
+        agrupe,
+        values,
+        title
+    ];
+
+    console.log(sets);
 
 
     const objetos = [
@@ -40,6 +55,24 @@ export default function Screen(props) {
         
     ];
 
+    useEffect(() => {
+        api.get("tables")
+        .then(res => {
+            setCtable(res.data);
+        });
+    }, [idUser]);
+
+    useEffect( () => {
+        api.get("columns", {
+            headers: {
+                Authorization: tableadd
+            }
+        })
+        .then(res => {
+            setCcolumns(res.data);
+        })
+    }, [tableadd]);
+
     function logOut() {
         if(window.confirm("Deseja sair?")) {
             localStorage.clear();
@@ -47,6 +80,17 @@ export default function Screen(props) {
             history.push('/');
         }
         return;
+    }
+
+    async function handleDeleteScreen(id) {
+        if(window.confirm("Deseja realmente excluir esta tela e todos os objetos vinculados?")){
+            api.delete(`screens/${id}`, {
+                headers: {
+                    Authorization: idUser
+                }
+            });
+            history.push("/default");
+        }
     }
 
 
@@ -75,8 +119,9 @@ export default function Screen(props) {
                 <img src={logoImg} alt="Logotipo" />
             </div>
 
-            <div>
+            <div style={{ display: 'flex', flexDirection: 'row' }}>
                 <Link className="button" title="Inserir novo dashboard" onClick={ () => newDashboard() }>Inserir um novo dashboard</Link>
+                <a className="button" style={{ cursor: 'pointer' }} title="Excluir tela atual" onClick={ () => handleDeleteScreen(id) }>Excluir tela</a>
             </div>
 
         </header>
@@ -132,14 +177,8 @@ export default function Screen(props) {
     )
 
 
-    function newDashboard() {
-        const t = { id: '10', type: 'grafico', model: 'linha', agrupe: 'cd_estado', values: 'vl_faturamento|vl_inicial|vl_final', title: 'Faturamento por estado', userId: '1', screenId: '1' };
-
-        const tables = [
-            { table: 'vm_rh' },
-            { table: 'vm_compras' }
-        ];
-
+    async function newDashboard() {
+        
         const types = [
             { type: 'Gráfico' },
             { type: 'Consulta' }
@@ -150,11 +189,6 @@ export default function Screen(props) {
             { model: 'Barra' },
             { model: 'Pizza' },
             { model: 'Consulta' }
-        ];
-
-        const agrupes = [
-            { agrupe: 'cd_estado' },
-            { agrupe: 'sexo' }
         ];
 
         const values = [
@@ -212,11 +246,11 @@ export default function Screen(props) {
 
             const res = <div>
                             <a className="list listTables" onClick={ () => listTables() }>Selecionar tabela</a>
-                            {tables.map( table => (
-                                                    <span className={table.table+'-table'}
-                                                        onClick={ () => selected(table.table+'-table')
+                            {ctable.map( table => (
+                                                    <span className={table.tables+'-table'}
+                                                        onClick={ () => selected(table.tables+'-table')
                                                     }>
-                                                        { table.table }
+                                                        { table.tables }
                                                     </span>
                                                 ) )}
                         </div>
@@ -254,14 +288,15 @@ export default function Screen(props) {
             ReactDom.render( res, document.querySelector('.listModels') );
         }
 
-        function listAgrupe() {
+        async function listAgrupe() {
+            console.log(ccolumns);
             const res = <div>
                             <a className="list listAgrupe" onClick={ () => listAgrupe() }>Selecionar agrupador</a>
-                            {agrupes.map( agrupe => (
-                                                    <span className={agrupe.agrupe+'-agrupe'}
-                                                        onClick={ () => selected(agrupe.agrupe+'-agrupe') }
+                            {ccolumns.map( agrupe => (
+                                                    <span className={agrupe.columnss+'-agrupe'}
+                                                        onClick={ () => selected(agrupe.columnss+'-agrupe') }
                                                     >
-                                                        { agrupe.agrupe }</span>
+                                                        { agrupe.columnss }</span>
                                                 ) )}
                         </div>
             
@@ -292,7 +327,7 @@ export default function Screen(props) {
                             <input 
                                 placeholder="Título"
                                 value={title}
-                                onChange={ e => setTitle(e.target.title) }/>
+                                onChange={ e => setTitle(e.target.value) }/>
 
                             <div className="mainconfigs">
 

@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import ReactDom from 'react-dom';
 import { Link, useHistory } from 'react-router-dom';
 import { FiPower, FiTrash2, FiArrowLeft } from 'react-icons/fi';
+import { parseISO, format } from 'date-fns';
+
+import api from '../../services/api';
 
 
 import './styles.css';
@@ -11,24 +14,40 @@ import logoImg from '../../assets/teste.png';
 import minibi from '../../assets/minibi.PNG';
 
 export default function Activities() {
+    const history = useHistory();
+
     const [ activities, setActivities ] = useState([]);
 
-    const history = useHistory();
     const idUser = localStorage.getItem('idUser');
 
-    const data = [
-        { id: '1', title: 'teste1', description: 'teste1', date: '10/10/2010' },
-        { id: '2', title: 'teste2', description: 'teste2', date: '10/10/2010' },
-        { id: '3', title: 'teste3', description: 'teste3', date: '10/10/2010' },
-        { id: '4', title: 'teste4', description: 'teste4', date: '10/10/2010' },
-        { id: '5', title: 'teste5', description: 'teste5', date: '10/10/2010' },
-        { id: '6', title: 'teste6', description: 'teste6', date: '10/10/2010' },
-        { id: '7', title: 'teste7', description: 'teste7', date: '10/10/2010' },
-    ];
+    async function createActivitie(e) {
 
-    useEffect( () => {
-        setActivities(data);
-    }, [idUser] );
+        const title = document.querySelector(".title").value;
+        const description = document.querySelector(".description").value;
+        const date = document.querySelector(".date").value;
+        const time = document.querySelector(".time").value;
+        const formatDate = date +' '+ time+':00';
+
+        const data = {
+            title,
+            description,
+            formatDate,
+            idUser
+        }
+        console.log(data);
+        api.post("activities", data);
+
+    }
+    
+    useEffect(() => {
+        api.get("activities", {
+            headers: {
+                Authorization: idUser,
+            }
+        }).then(res => {
+            setActivities(res.data);
+        });
+    }, [idUser]);
 
     function logOut() {
         if(window.confirm("Deseja sair?")) {
@@ -37,17 +56,68 @@ export default function Activities() {
             history.push('/');
         }
         return;
-    }
+    };
+    
 
     async function handleDeleteActivities(id) {
         if(window.confirm("Você realmente deseja excluir esta atividade?")){
             try {
                 setActivities(activities.filter(activities => activities.id !== id));
+                api.delete(`activities/${id}`, {
+                    headers: {
+                        Authorization: idUser
+                    }
+                });
             }catch(err) {
                 alert('Erro ao deletar caso, tente novamente.');
             }
         }
     }
+
+    async function NewActivitie() {
+
+        let newActivitie = (
+            <form onSubmit={createActivitie} className="main-content">
+                    <ul>
+                            
+                        <li>
+                            <strong>TÍTULO:</strong>
+                            <input 
+                                className="title"
+                            />
+    
+                            <strong>DESCRIÇÃO:</strong>
+                            <textarea
+                                className="description"
+                            />
+    
+                            <strong>DATA:</strong>
+                            <div>
+                                <input 
+                                    type="date"
+                                    className="date"
+                                />
+                                <input
+                                    type="time"
+                                    className="time"
+                                />
+                            </div>
+    
+                            <button type="submit" className="button">Cadastrar</button>
+    
+                        </li>
+    
+                    </ul>
+                
+            </form>
+        );
+    
+        if(document.querySelector('.main-content')) {
+            newActivitie = '';
+        }
+    
+        return ReactDom.render(newActivitie, document.querySelector('.main'));
+    };
 
 
     return(
@@ -96,7 +166,7 @@ export default function Activities() {
                                 <p>{activitie.description}</p>
 
                             <strong>DATA:</strong>
-                                <p>{activitie.date}</p>
+                                <p>{format(parseISO(activitie.dt_activities), "'Dia' dd 'do' MM 'de' yyyy', às ' HH:mm'hrs'")}</p>
 
                             <button type="button" onClick={() => handleDeleteActivities(activitie.id)}>
                                 <FiTrash2 size={20} color="#a8a8b3" />
@@ -111,38 +181,3 @@ export default function Activities() {
 
     )
 }
-
-async function NewActivitie() {
-
-    let newActivitie = (
-        <div className="main-content">
-                <ul>
-                        
-                    <li>
-                        <strong>TÍTULO:</strong>
-                        <input />
-
-                        <strong>DESCRIÇÃO:</strong>
-                        <textarea />
-
-                        <strong>DATA:</strong>
-                        <input type="date" />
-
-                        <button className="button">Cadastrar</button>
-
-                    </li>
-
-                </ul>
-            
-        </div>
-    );
-
-    if(document.querySelector('.main-content')) {
-        newActivitie = '';
-    }
-
-    return ReactDom.render(newActivitie, document.querySelector('.main'));
-
-
-
-};

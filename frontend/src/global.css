@@ -30,7 +30,8 @@ button, select, option {
     cursor: pointer;
 }
 
-form input {
+form input,
+form select {
     width: calc(100% - 48px);
     height: 50px;
     color: #333;

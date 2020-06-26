@@ -26,8 +26,6 @@ export default function TwoSimplePieChart(props) {
   const values = props.values.split('|');
   const title  = props.title;
 
-  console.log('ID TELA: '+screenId);
-  console.log('ID OBJETO: '+objetoId);
 
   const [ data, setData ] = useState([]);
 

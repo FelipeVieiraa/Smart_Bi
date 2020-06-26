@@ -69,13 +69,12 @@
 .main-content ul {
     margin: 0 auto;
     max-width: 500px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
 }
 
 .main-content ul li {
     width: 100%;
+    display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
 }
@@ -85,7 +84,6 @@
     width: 100%;
     max-width: 100%;
     min-width: 100%;
-    max-height: 35px;
     border: none;
     background: #f1f1f1;
     box-shadow: 0px 0px 3px 0px #f1f1f1;
@@ -93,6 +91,26 @@
     border-radius: 4px;
 }
 
+.main-content ul li input {
+    max-height: 30px;
+    height: 30px;
+}
+
 .main-content ul li textarea {
     min-height: 45px;
 }
+
+.main-content ul li div {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 90%;
+    justify-content: space-between;
+}
+
+.main-content ul li div input {
+    max-width: 180px;
+    min-width: 180px;
+    text-align: center;
+}
+

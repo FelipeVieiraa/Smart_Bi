@@ -1,26 +1,52 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import ReactDom from 'react-dom';
 import { Link } from 'react-router-dom';
+
+import api from '../../services/api';
 
 //IMGs
 import add from '../../assets/add.png';
 
 //Styles
-import { Title, Container, Content, Ul, Inputs } from '../styles'
+import { Title, Container, Content, Forms, Inputs } from '../styles'
 
-export default function listScreens() {
+export default function ListScreens() {
     const nameUser = localStorage.getItem('name');
+    const idUser = localStorage.getItem('idUser');
 
-    const screens = [
-        { id: '1', name: 'Recursos Humanos', description: 'RH', image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60', dashboards: '1|2|3|4' },
-        { id: '2', name: 'Compras', description: 'Compras', image: 'https://images.unsplash.com/photo-1556742208-999815fca738?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60', dashboards: '5|6|7|8' }
-    ];
+    const [ screens, setSreens ] = useState([]);
+
+    useEffect(() => {
+        api.get("screens")
+        .then(res => {
+            setSreens(res.data);
+        })
+    }, [nameUser]);
+
+
+    const [ name, setName ] = useState('');
+    const [ image, setImage ] = useState('');
+
+    const data = {
+        name,
+        image,
+        idUser
+    };
+
+    async function createScreen() {
+
+        try{
+            if(name.length <= 0) {
+                return alert("Preencha o campo nome.");
+            }
+            api.post("screens", data);
+        }catch {
+            alert("Erro!");
+        }
+
+    }
 
     const style = {
-        lastBox: {
-            minWidth: "215px",
-            minHeight: "150px"
-        },
         box: {
             margin: '30px',
             maxWidth: '300px',
@@ -45,10 +71,29 @@ export default function listScreens() {
         },
         addImage: {
             width: '50px',
+            cursor: 'pointer',
             height: '50px',
-            marginTop: 'calc( 100% - 240px )',
             opacity: '0.7'
         }
+    }
+
+    async function openAdd() {
+
+        const retorno = (<div>
+                          <Inputs
+                            placeholder="Nome"
+                            title={name}
+                            onChange={ e => setName(e.target.value) }
+                          />
+                          <Inputs
+                            placeholder="http:// URL-Img"
+                            title={image}
+                            onChange={ e => setImage(e.target.value) } 
+                          />
+                          <button className="button" type="submit" style={{ maxWidth: '100px', margin: '0', marginTop: '10px'}}>Adicionar</button>
+                        </div>);
+
+        ReactDom.render(retorno, document.querySelector(".mainAdd"));
     }
 
     return (
@@ -58,13 +103,16 @@ export default function listScreens() {
             <Content className="responsive">
                 { screens.map(screen => (
                     <Link className="BoxA" key={screen.id} style={style.box} to={"/screen/"+screen.id}>
-                        {screen.description}
+                        {screen.name}
                         <img style={style.boxImages} src={screen.image} />
                     </Link>
                 )) }
-                    <Link className="BoxA mainAdd" style={style.lastBox, style.box} onClick={ () => newScreen() }>
-                        <img style={style.addImage} src={ add } />
-                    </Link>
+                    
+                <Forms onSubmit={ createScreen } className="mainAdd" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <img style={style.addImage} onClick={() => openAdd()} src={add} alt="adicionar tela" />
+                </Forms>
+                                
+                   
             </Content>
             
         </Container>
@@ -73,17 +121,3 @@ export default function listScreens() {
 }
 
 
-async function newScreen() {
-
-    const newSc = (
-        <Ul>
-            <li style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <Inputs placeholder="Nome"/>
-                <Inputs placeholder="http:// URL-Img" />
-                <a className="button" style={{ maxWidth: '100px', margin: '0'}}>Adicionar</a>
-            </li>
-        </Ul>
-    );
-
-    ReactDom.render( newSc, document.querySelector('.mainAdd') );
-}

@@ -1,0 +1,81 @@
+.register-container {
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+}
+
+.register-container div.content {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    height: 80%;
+    width: 100%;
+    margin-top: 60px;
+}
+
+.register-container .content > div p {
+    font-size: 22px;
+}
+
+.register-container .content > div a.back-link {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-top: 20px;
+    color: #41414d;
+    font-size: 16px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: opacity 0.2s;
+}
+
+.register-container .content > div a.back-link:hover {
+    opacity: 0.8;
+}
+
+.register-container .content form {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    margin-left: 50px;
+    max-width: 468px;
+}
+
+.register-container .content form h1 {
+    text-align: center;
+    color: #2c2437;
+}
+
+.register-container .content form input,
+.register-container .content form select {
+    margin-top: 15px;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.input-group div {
+    flex: 1;
+}
+
+.input-group div select {
+    width: 100%;
+}
+
+.input-group div + div {
+    margin-left: 10px;
+}
+
+.input-group div + div select {
+    width: 100%;
+}
+
+.register-container .button {
+    margin: 28px auto;
+}
+
