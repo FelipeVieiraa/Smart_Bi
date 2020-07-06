@@ -2,30 +2,8 @@ import React, { useState, useEffect } from 'react';
 import {
     BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
   } from 'recharts';
+import api from '../../services/api';
 
-const data01 = [
-    {
-      name: 'Page A', uv: 4000, pv: 2400, amt: 2400,
-    },
-    {
-      name: 'Page B', uv: 3000, pv: 1398, amt: 2210,
-    },
-    {
-      name: 'Page C', uv: 2000, pv: 9800, amt: 2290,
-    },
-    {
-      name: 'Page D', uv: 2780, pv: 3908, amt: 2000,
-    },
-    {
-      name: 'Page E', uv: 1890, pv: 4800, amt: 2181,
-    },
-    {
-      name: 'Page F', uv: 2390, pv: 3800, amt: 2500,
-    },
-    {
-      name: 'Page G', uv: 3490, pv: 4300, amt: 2100,
-    },
-  ];
 
 export default function SimpleBarChart(props) {
     const jsfiddleUrl = 'https://jsfiddle.net/alidingling/30763kr7/';
@@ -37,19 +15,22 @@ export default function SimpleBarChart(props) {
     const agrupe = props.agrupe;
     const values = props.values.split('|');
     const title  = props.title;
+    const tabl   = props.table;
 
 
     const [ data, setData ] = useState([]);
 
-    const graficos1 = [
-        { cd_estado: '1' , vl_faturamento: '1200', vl_inicial: '100', vl_final: '10000' },
-        { cd_estado: '2' , vl_faturamento: '2200', vl_inicial: '100', vl_final: '10000' },
-        { cd_estado: '3' , vl_faturamento: '4100', vl_inicial: '100', vl_final: '10000' },
-        { cd_estado: '4' , vl_faturamento: '5200', vl_inicial: '100', vl_final: '10000' },
-        { cd_estado: '5' , vl_faturamento: '4000', vl_inicial: '100', vl_final: '10000' },
-        { cd_estado: '6' , vl_faturamento: '3200', vl_inicial: '100', vl_final: '10000' },
-        { cd_estado: '7' , vl_faturamento: '2100', vl_inicial: '100', vl_final: '10000' }
-    ];
+    useEffect(() => {
+      api.get("graph", {
+        headers: {
+          Authorization: tabl
+        }
+      }).then(res => {
+        setData(res.data);
+      })
+    }, [objetoId]);
+
+    console.log(data);
 
     const styled = {
         boxGraph: {
@@ -74,13 +55,6 @@ export default function SimpleBarChart(props) {
         },
     }
 
-    useEffect(() => {
-        if(objetoId == '30') {
-            const dataObjeto = graficos1;
-            setData(dataObjeto);
-        }
-    }, [objetoId]);
-
     return(
             <div>
                 <div style={styled.contenth1}>
@@ -96,7 +70,7 @@ export default function SimpleBarChart(props) {
                         }}
                     >
                         <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="cd_estado" />
+                        <XAxis dataKey={agrupe} />
                         <YAxis />
                         <Tooltip />
                         <Legend />

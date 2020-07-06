@@ -9,7 +9,8 @@ const UsersController = require('./controllers/UsersController');
 const ScreensController = require('./controllers/ScreensController');
 const ActivitiesController = require('./controllers/ActivitiesController');
 const ConfigGraphs = require('./controllers/ConfigGraphs');
-
+const DashboardsController = require('./controllers/DashboardsController');
+const GraphsController = require('./controllers/GraphsController');
 
 
 //Rotas:
@@ -26,4 +27,9 @@ server.delete("/activities/:id", ActivitiesController.delete);
 
 server.get("/tables", ConfigGraphs.tables);
 server.get("/columns", ConfigGraphs.columns);
+
+server.get("/objects/:id", DashboardsController.index);
+server.post("/objects/:id", DashboardsController.create);
+
+server.get("/graph", GraphsController.index);
 

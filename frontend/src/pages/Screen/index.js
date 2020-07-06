@@ -23,37 +23,38 @@ export default function Screen(props) {
 
     const idUser = localStorage.getItem('idUser');
 
-    const [ tableadd, setTableadd ] = useState('');
-    const [ typeadd, setTypeadd ] = useState('');
-    const [ model, setModel ] = useState('');
-    const [ agrupe, setAgrupe ] = useState('');
-    const [ values, setValues ] = useState('');
+    const [ tableadd, setTableadd ] = useState();
+    const [ typeadd, setTypeadd ] = useState();
+    const [ model, setModel ] = useState();
+    const [ agrupe, setAgrupe ] = useState();
+    const [ values, setValues ] = useState();
     const [ title, setTitle ] = useState();
 
     const [ ctable, setCtable ] = useState([]);
-    const [ ccolumns , setCcolumns ] = useState([]);
+    const [ objects, setObjects ] = useState([]);
 
     const sets = [
+        title,
         tableadd,
         typeadd,
         model,
         agrupe,
         values,
-        title
+        idUser
     ];
 
-    console.log(sets);
+    console.log(objects);
 
-
-    const objetos = [
-        { id: '10', type: 'grafico', model: 'linha', agrupe: 'cd_estado', values: 'vl_faturamento|vl_inicial|vl_final', title: 'Faturamento por estado', userId: '1', screenId: '1' },
-        { id: '11', type: 'grafico', model: 'pizza', agrupe: 'sexo', values: 'countSexo', title: 'Quantidade de masculino/feminino', userId: '1', screenId: '1' },
-        { id: '12', type: 'grafico', model: 'linha', agrupe: 'cd_estado', values: 'countOcorrencias', title: 'Ocorrências de incêndio', userId: '1', screenId: '1' },
-        { id: '13', type: 'grafico', model: 'linha', agrupe: 'cd_estado', values: 'vl_faturamento|vl_inicial|vl_final', title: 'Faturamento por estado', userId: '1', screenId: '1' },
-        { id: '20', type: 'consulta', model: 'consulta', agrupe: 'cd_estado', values: 'vl_faturamento|vl_inicial|vl_final', title: 'Faturamento por estado', userId: '1', screenId: '1' },
-        { id: '30', type: 'grafico', model: 'barra', agrupe: 'cd_estado', values: 'vl_faturamento|vl_inicial|vl_final', title: 'Faturamento por estado', userId: '1', screenId: '1' },
-        
-    ];
+    useEffect(() => {
+        api.get(`/objects/${id}`, {
+            headers: {
+                Authorization: idUser
+            }
+        })
+        .then(res => {
+            setObjects(res.data);
+        })
+    }, [idUser]);
 
     useEffect(() => {
         api.get("tables")
@@ -61,17 +62,6 @@ export default function Screen(props) {
             setCtable(res.data);
         });
     }, [idUser]);
-
-    useEffect( () => {
-        api.get("columns", {
-            headers: {
-                Authorization: tableadd
-            }
-        })
-        .then(res => {
-            setCcolumns(res.data);
-        })
-    }, [tableadd]);
 
     function logOut() {
         if(window.confirm("Deseja sair?")) {
@@ -91,6 +81,33 @@ export default function Screen(props) {
             });
             history.push("/default");
         }
+    }
+
+    function handleAddObject(e) {
+        const title = document.getElementById("setTitle").value;
+        const table = document.getElementById("setTable").querySelector(".selected").innerText;
+        const type  = document.getElementById("setType").querySelector(".selected").innerText;
+        const model = document.getElementById("setModel").querySelector(".selected").innerText;
+        const agrupe = document.getElementById("setAgrupe").value;
+        const values = document.getElementById("setValues").value;
+
+        const sets = {
+            title,
+            table,
+            type,
+            model,
+            agrupe,
+            values,
+            idUser
+        }
+        
+        try{
+            api.post(`/objects/${id}`, sets);
+            return alert("Novo dashboard criado!");
+        }catch{
+            return alert("Tente novamente!");
+        }
+
     }
 
 
@@ -130,43 +147,47 @@ export default function Screen(props) {
         </div>
 
         <div className="screen-content">
-            { objetos.map( objeto => { 
-                let grafic = objeto.model;
+            { objects.map( objeto => { 
+                let grafic = objeto.model.toLowerCase();
 
                 switch(grafic) {
                     case 'linha': return(<SimpleLineChart 
                                             key={objeto.id} 
                                             agrupe={objeto.agrupe} 
-                                            values={objeto.values} 
+                                            values={objeto.valuess} 
                                             screen={objeto.screenId} 
                                             id={objeto.id} 
                                             title={objeto.title}
+                                            table={objeto.tablee}
                                         />);
 
                     case 'pizza': return (<TwoSimplePieChart
                                             key={objeto.id} 
                                             agrupe={objeto.agrupe} 
-                                            values={objeto.values} 
+                                            values={objeto.valuess} 
                                             screen={objeto.screenId} 
                                             id={objeto.id} 
                                             title={objeto.title}
+                                            table={objeto.tablee}
                                         />);
                     case 'consulta': return (<Consulta 
                                                 key={objeto.id} 
                                                 agrupe={objeto.agrupe} 
-                                                values={objeto.values} 
+                                                values={objeto.valuess} 
                                                 screen={objeto.screenId} 
                                                 id={objeto.id} 
                                                 title={objeto.title}
                                                 totalagrupe={objeto.agrupe+'|'+objeto.values}
+                                                table={objeto.tablee}
                                             />);
                     case 'barra':   return (<SimpleBarChart
-                                                key={objeto.id} 
+                                                key={objeto.id}
                                                 agrupe={objeto.agrupe} 
-                                                values={objeto.values} 
+                                                values={objeto.valuess} 
                                                 screen={objeto.screenId} 
                                                 id={objeto.id} 
                                                 title={objeto.title}
+                                                table={objeto.tablee}
                                             />);
                 }
                 
@@ -244,8 +265,7 @@ export default function Screen(props) {
 
         function listTables() {
 
-            const res = <div>
-                            <a className="list listTables" onClick={ () => listTables() }>Selecionar tabela</a>
+            const res = <div id="setTable">
                             {ctable.map( table => (
                                                     <span className={table.tables+'-table'}
                                                         onClick={ () => selected(table.tables+'-table')
@@ -255,12 +275,11 @@ export default function Screen(props) {
                                                 ) )}
                         </div>
             
-            ReactDom.render( res, document.querySelector('.listTables') );
+            ReactDom.render( res, document.getElementById('listTables'));
         }
 
         function listTypes() {
-            const res = <div>
-                            <a className="list listTypes" onClick={ () => listTypes() }>Selecionar tipo</a>
+            const res = <div id="setType">
                             {types.map( type => (
                                                     <span className={type.type+'-type'}
                                                         onClick={ () => selected(type.type+'-type') }
@@ -270,12 +289,11 @@ export default function Screen(props) {
                                                 ) )}
                         </div>
             
-            ReactDom.render( res, document.querySelector('.listTypes') );
+            ReactDom.render( res, document.getElementById('listTypes') );
         }
 
         function listModels() {
-            const res = <div>
-                            <a className="list listModels" onClick={ () => listModels() }>Selecionar Modelo</a>
+            const res = <div id="setModel">
                             {models.map( model => (
                                                     <span className={model.model+'-model'}
                                                         onClick={ () => selected(model.model+'-model') }
@@ -285,65 +303,52 @@ export default function Screen(props) {
                                                 ) )}
                         </div>
             
-            ReactDom.render( res, document.querySelector('.listModels') );
-        }
-
-        async function listAgrupe() {
-            console.log(ccolumns);
-            const res = <div>
-                            <a className="list listAgrupe" onClick={ () => listAgrupe() }>Selecionar agrupador</a>
-                            {ccolumns.map( agrupe => (
-                                                    <span className={agrupe.columnss+'-agrupe'}
-                                                        onClick={ () => selected(agrupe.columnss+'-agrupe') }
-                                                    >
-                                                        { agrupe.columnss }</span>
-                                                ) )}
-                        </div>
-            
-            ReactDom.render( res, document.querySelector('.listAgrupe') );
-        }
-
-        function listValues() {
-            const res = <div>
-                            <a className="list listValues" onClick={ () => listValues() }>Selecionar valores</a>
-                            {values.map( value => (
-                                                    <span className={value.values+'-values'}
-                                                        onClick={ () => selected(value.values+'-values') }
-                                                    >
-                                                        { value.values }</span>
-                                                ) )}
-                        </div>
-            
-            ReactDom.render( res, document.querySelector('.listValues') );
+            ReactDom.render( res, document.getElementById('listModels') );
         }
 
 
         const newDash = (
-            <div className="main-content">
+            <div className="main-content-graphs">
                 <ul>
                     <li>
 
-                        <form>
+                        <form onSubmit={handleAddObject}>
                             <input 
                                 placeholder="Título"
-                                value={title}
+                                title={title}
+                                id="setTitle"
                                 onChange={ e => setTitle(e.target.value) }/>
 
                             <div className="mainconfigs">
 
-                                <a className="list listTables" onClick={ () => listTables() }>Selecionar tabela</a>
+                                <li id="listTables" className="list button" onClick={ () => listTables() }>Selecionar tabela</li>
                                 
-                                <a className="list listTypes" onClick={ () => listTypes() }>Selecionar tipo</a>
+                                
+                                <li id="listTypes" className="list button" onClick={ () => listTypes() }>Selecionar tipo</li>
+                                
+                            
+                                <li id="listModels" className="list button" onClick={ () => listModels() }>Selecionar Modelo</li>
+                                
+                                <span>Agrupador:</span>
+                                <input 
+                                    title={agrupe}
+                                    required
+                                    id="setAgrupe"
+                                    onChange={ e => setAgrupe(e.target.value) }
+                                />
 
-                                <a className="list listModels" onClick={ () => listModels() }>Selecionar Modelo</a>
-
-                                <a className="list listAgrupe" onClick={ () => listAgrupe() }>Selecionar agrupador</a>
-
-                                <a className="list listValues" onClick={ () => listValues() }>Selecionar valores</a>
+                                <span>Values:</span>
+                                <input
+                                    title={values}
+                                    required
+                                    id="setValues"
+                                    onChange={ e => setValues(e.target.value) }
+                                />
+                                
 
                             </div>
 
-                            <button className="button">Adicionar</button>
+                            <button type="submit" className="button">Adicionar</button>
 
                         </form>
 

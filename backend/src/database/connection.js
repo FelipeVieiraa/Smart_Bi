@@ -42,7 +42,22 @@ var sql = [`CREATE TABLE IF NOT EXISTS users (
                 dashboards VARCHAR(50) DEFAULT NULL,
                 id_user INT NOT NULL,
                 FOREIGN KEY (id_user) REFERENCES users(id)
-            )`
+            )`,
+
+            `CREATE TABLE IF NOT EXISTS objects (
+                id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                dashboard VARCHAR(200) DEFAULT NULL,
+                tablee VARCHAR(100) NOT NULL,
+                title VARCHAR(100) NOT NULL,
+                type VARCHAR(20) NOT NULL,
+                model VARCHAR(20) NOT NULL,
+                agrupe VARCHAR(100) NOT NULL,
+                valuess VARCHAR(300) NOT NULL,
+                id_user INT NOT NULL,
+                id_screen INT NOT NULL,
+                FOREIGN KEY (id_user) REFERENCES users(id),
+                FOREIGN KEY (id_screen) REFERENCES screens(id)
+            ) `
         ]
 
 sql.map( query => {

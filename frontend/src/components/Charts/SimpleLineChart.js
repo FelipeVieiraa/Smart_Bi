@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
 } from 'recharts';
+import api from '../../services/api';
 
 
 const Exampledata = [
@@ -38,41 +39,10 @@ export default function SimpleLineChart(props) {
     const agrupe = props.agrupe;
     const values = props.values.split('|');
     const title  = props.title;
+    const tabl   = props.table;
 
 
     const [ data, setData ] = useState([]);
-
-    const graficos1 = [
-        { cd_estado: '1' , vl_faturamento: '1200', vl_inicial: '100', vl_final: '10000' },
-        { cd_estado: '2' , vl_faturamento: '2200', vl_inicial: '100', vl_final: '10000' },
-        { cd_estado: '3' , vl_faturamento: '4100', vl_inicial: '100', vl_final: '10000' },
-        { cd_estado: '4' , vl_faturamento: '5200', vl_inicial: '100', vl_final: '10000' },
-        { cd_estado: '5' , vl_faturamento: '4000', vl_inicial: '100', vl_final: '10000' },
-        { cd_estado: '6' , vl_faturamento: '3200', vl_inicial: '100', vl_final: '10000' },
-        { cd_estado: '7' , vl_faturamento: '2100', vl_inicial: '100', vl_final: '10000' }
-    ];
-    const graficos2 = [
-        { sexo: 'M' , countSexo: '10' },
-        { sexo: 'F' , countSexo: '20' }
-    ];
-    const graficos3 = [
-        { cd_estado: '1' , countOcorrencias: '1200' },
-        { cd_estado: '2' , countOcorrencias: '2200' },
-        { cd_estado: '3' , countOcorrencias: '4100' },
-        { cd_estado: '4' , countOcorrencias: '5200' },
-        { cd_estado: '5' , countOcorrencias: '4000' },
-        { cd_estado: '6' , countOcorrencias: '3200' },
-        { cd_estado: '7' , countOcorrencias: '2100' }
-    ];
-    const graficos4 = [
-        { cd_estado: '1' , vl_faturamento: '1200', vl_inicial: '100', vl_final: '10000' },
-        { cd_estado: '2' , vl_faturamento: '2200', vl_inicial: '100', vl_final: '10000' },
-        { cd_estado: '3' , vl_faturamento: '4100', vl_inicial: '100', vl_final: '10000' },
-        { cd_estado: '4' , vl_faturamento: '5200', vl_inicial: '100', vl_final: '10000' },
-        { cd_estado: '5' , vl_faturamento: '4000', vl_inicial: '100', vl_final: '10000' },
-        { cd_estado: '6' , vl_faturamento: '3200', vl_inicial: '100', vl_final: '10000' },
-        { cd_estado: '7' , vl_faturamento: '2100', vl_inicial: '100', vl_final: '10000' }
-    ];
 
     const styled = {
         boxGraph: {
@@ -97,24 +67,14 @@ export default function SimpleLineChart(props) {
         }
     };
 
-
     useEffect(() => {
-        if(objetoId == '10') {
-            const dataObjeto = graficos1;
-            setData(dataObjeto);
+      api.get("graph", {
+        headers: {
+          Authorization: tabl
         }
-        if(objetoId == '11') {
-            const dataObjeto = graficos2;
-            setData(dataObjeto);
-        }
-        if(objetoId == '12') {
-            const dataObjeto = graficos3;
-            setData(dataObjeto);
-        }
-        if(objetoId == '13') {
-            const dataObjeto = graficos4;
-            setData(dataObjeto);
-        }
+      }).then(res => {
+        setData(res.data);
+      })
     }, [objetoId]);
 
     return (
