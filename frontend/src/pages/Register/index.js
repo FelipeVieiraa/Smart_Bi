@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import ReactDOM from 'react-dom';
 import { FiArrowLeft } from 'react-icons/fi';
+
+import { AuthContext } from '../../contexts/auth';
 
 import api from '../../services/api';
 import './styles.css'; 
@@ -12,44 +14,78 @@ import logoImg from '../../assets/teste.png';
 export default function Register() {
     const history = useHistory();
 
+    const { userRegister } = useContext(AuthContext);
+
     const [ username, setUsername ] = useState('');
     const [ email, setEmail ] = useState('');
     const [ password, setPassword ] = useState('');
     const [ whats, setWhats ] = useState('');
-    const [ uf, setUf ] = useState('');
-    const [ city, setCity ] = useState('');
-
-    const data = {
-        username,
-        email,
-        password,
-        whats,
-        uf,
-        city
-    };
+    const [ uf, setUf ] = useState(null);
+    const [ city, setCity ] = useState(null);
 
     useEffect(() => {
-        setCity('');
-    }, [uf]);
+        async function populateUFs() {
 
-    async function biRegister(e) {
-        e.preventDefault();
-
-        if(uf.length <= 0 || city.length <= 0) {
-            return alert("Favor preencher as localidades, estado e cidade.");
+            let inserts = [];
+        
+            await fetch("https://servicodados.ibge.gov.br/api/v1/localidades/estados")
+                .then( res => res.json())
+                .then( data => {
+                    data.map( value => {
+                        let repeat = `<option value="${value.sigla}">${value.nome}</option>`;
+                        inserts.push(repeat);
+                    } )
+                } );
+        
+            const junction = '<option value"" >Selecione o estado</option>' + inserts.join('');
+            
+            document.getElementById('states-select').innerHTML = junction; 
         }
 
-        if(whats.length <= 7) {
-            return alert("Número de celular deve possuir 8 ou mais caractéres!");
+        populateUFs();
+    }, []);
+
+    document.addEventListener('change', e => {
+        let change = e.target;
+    
+        if(change.title == 'estados') {
+            getCities(change.value);
+    
+            document.getElementById('city-select').removeAttribute('disabled');
         }
         
-        const res = await api.post('users', data);
-        alert("Cadastrado com sucesso!");
-        history.push("/");
+    });
 
+    async function getCities(e) {
+
+        if(e.length > 3) {
+            e = '42';
+        }
+    
+        let inserts = [];
+    
+        const url = `https://servicodados.ibge.gov.br/api/v1/localidades/estados/${e}/municipios`;
+    
+        await fetch(url)
+        .then( res => res.json())
+            .then( data => {
+                data.map( value => {
+                    let repeat = `<option value="${value.nome}">${value.nome}</option>`;
+                    inserts.push(repeat);
+                } )
+            } );
+    
+        const jun = '<option value"">Selecione a cidade</option>' + inserts.join('');
+    
+        document.getElementById('city-select').innerHTML = jun ;
+    
     }
 
-    populateUFs();
+    async function handleRegister(e) {
+        e.preventDefault();
+
+        userRegister(username, email, password, whats, uf, city, history);
+    }
 
     return(
         <div className="register-container">
@@ -64,7 +100,7 @@ export default function Register() {
                 </div>
 
 
-                <form onSubmit={biRegister}>
+                <form onSubmit={handleRegister}>
                     <h1>Cadastro</h1>
 
                     <input
@@ -133,64 +169,5 @@ export default function Register() {
         
         </div>  
     );
-
-}
-
-
-
-//Functions
-async function populateUFs() {
-
-    let inserts = [];
-
-    await fetch("https://servicodados.ibge.gov.br/api/v1/localidades/estados")
-        .then( res => res.json())
-        .then( data => {
-            data.map( value => {
-                let repeat = `<option value="${value.sigla}">${value.nome}</option>`;
-                inserts.push(repeat);
-            } )
-        } );
-
-    const jun = '<option value"" >Selecione o estado</option>' + inserts.join('');
-    
-    document.getElementById('states-select').innerHTML = jun;
-    
-}
-
-
-document.addEventListener('change', e => {
-    let change = e.target;
-
-    if(change.title == 'estados') {
-        getCities(change.value);
-
-        document.getElementById('city-select').removeAttribute('disabled');
-    }
-    
-});
-
-async function getCities(e) {
-
-    if(e.length > 3) {
-        e = '42';
-    }
-
-    let inserts = [];
-
-    const url = `https://servicodados.ibge.gov.br/api/v1/localidades/estados/${e}/municipios`;
-
-    await fetch(url)
-    .then( res => res.json())
-        .then( data => {
-            data.map( value => {
-                let repeat = `<option value="${value.nome}">${value.nome}</option>`;
-                inserts.push(repeat);
-            } )
-        } );
-
-    const jun = '<option value"">Selecione a cidade</option>' + inserts.join('');
-
-    document.getElementById('city-select').innerHTML = jun ;
 
 }

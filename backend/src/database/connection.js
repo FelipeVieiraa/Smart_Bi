@@ -3,11 +3,11 @@ const mysql = require('mysql');
 const connection = mysql.createConnection({
     host: "localhost",
     user: "root",
-    password: "vieira05",
+    password: "Vieira%05",
     database: "smartbi"
 });
 
-//ALTER USER "root"@"localhost" IDENTIFIED WITH mysql_native_password BY "vieira05";
+//ALTER USER "root"@"localhost" IDENTIFIED WITH mysql_native_password BY "Vieira%05";
 const testeConnection = connection.connect((err) => {
     if(err) throw err;
     console.log("mysql conectado!");

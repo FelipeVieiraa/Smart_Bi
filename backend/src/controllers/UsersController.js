@@ -4,15 +4,9 @@ module.exports = {
     async logon(req, res) {
         const { username, password } = req.body;
 
-        if(!(username.length > 0 || password.length > 0)) {
-            res.status(400).send("Preencher corretamente username e password.");
-        }
-
-        connection.query(`SELECT username FROM smartbi.users where username = '${username}' and password = '${password}'`, (err, results) => {
+        connection.query(`SELECT id, username, email, whats, uf, city FROM smartbi.users where username = '${username}' or email = '${username}' and password = '${password}'`, (err, results) => {
             if(err){
                 return res.json(err);
-            }else if( results.length == 0 ) {
-                return res.status(400).json({ error: 'Usuário não existe!' });
             }
                 console.log(results);
                 return res.json(results);

@@ -1,8 +1,13 @@
-import React from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { Link, useHistory } from 'react-router-dom';
-import { FiPower } from 'react-icons/fi';
+import ReactDom from 'react-dom';
+import { FiFolderPlus } from 'react-icons/fi';
 
 import './styles.css';
+
+import api from '../../services/api';
+
+import { AuthContext } from '../../contexts/auth';
 
 //IMGs:
 //import addIcon from '../../assets/add.svg';
@@ -10,40 +15,81 @@ import logoImg from '../../assets/teste.png';
 import minibi from '../../assets/minibi.PNG';
 
 //Components
-import ListScreens from '../../components/Default/listScreens';
+import Header from '../../components/Header';
+import BoxScreen from '../../components/BoxScreen';
 
 export default function Default() {
     const history = useHistory();
 
-    function logOut() {
-        if(window.confirm("Deseja sair?")) {
-            localStorage.clear();
+    const { userLogout, user } = useContext(AuthContext);
 
-            history.push('/');
+    const [ name, setName ] = useState('');
+    const [ image, setImage ] = useState('');
+    const [ screens, setSreens ] = useState([]);
+
+    useEffect(() => {
+        api.get("screens")
+        .then(res => {
+            setSreens(res.data);
+        })
+    }, []);
+
+    async function handleOpenForm() {
+
+        const retorno = (<>
+                            <input
+                                placeholder="Nome"
+                                title={name}
+                                onChange={ e => setName(e.target.value) }
+                            />
+                            <input
+                                placeholder="http:// URL-Img"
+                                title={image}
+                                onChange={ e => setImage(e.target.value) } 
+                            />
+                            <button 
+                                className="button" 
+                                type="submit" 
+                                style={{ 
+                                    maxWidth: '100px', 
+                                    margin: '0', 
+                                    marginTop: '10px'
+                                }}
+                            >
+                                Adicionar
+                            </button>
+                        </>);
+
+        ReactDom.render(retorno, document.getElementById('form'));
+    }
+
+    async function handleCreateScreen() {
+        const data = {
+            name,
+            image,
+            idUser: user.id
+        };
+
+        try{
+            if(name.length <= 0) {
+                return alert("Preencha o campo nome.");
+            }
+            api.post("screens", data);
+        }catch {
+            alert("Erro!");
         }
-        return;
+
     }
 
     return(
         <div className="default-container">
-            <div className="menu">
 
-                <div className="minMenu-right">
-                    <img src={minibi} alt="Logo bi"/>
-                </div>
+            <Header />
 
-                <div className="minMenu-left">
-                    <button className="BoxA" onClick={ logOut }>
-                        <FiPower title="Logout" size={18} color="#E02041"/>
-                    </button>
-                </div>
-
-            </div>
-
-            <header>
+            <div className="sub-header">
                 <div>
                     <img src={logoImg} alt="Logotipo" />
-                    <span>Bem vindo(a), acesse telas disponíveis ou cadastre suas atividades.</span>
+                    <span>Bem vindo(a), acesse as telas disponíveis ou registre atividades.</span>
                 </div>
 
                 <div>
@@ -52,9 +98,33 @@ export default function Default() {
                     </Link>
                 </div>
 
-            </header>
+            </div>
 
-            <ListScreens />
+            <div className="grid-screens">
+
+                { screens.map(screen => (
+                    <BoxScreen 
+                        class="box-content" 
+                        idScreen={screen.id} 
+                        screen={screen.name} 
+                        image={screen.image}
+                    />
+                )) }
+
+                <div className="box-content" style={{ justifyContent: 'center' }}>
+                    <form 
+                        id="form"
+                        onSubmit={handleCreateScreen}    
+                    >
+                        <button onClick={() => handleOpenForm()}>
+                            <FiFolderPlus size={50} color="#FFF"/>
+                        </button>
+                    </form>
+                </div>
+
+            </div>
+
+            
         </div>
     );
 }

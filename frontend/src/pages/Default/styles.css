@@ -31,46 +31,104 @@
     border-radius: 50%;
 }
 
-.default-container header {
+.default-container .sub-header {
     width: 100%;
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
+    justify-content: space-around;
 }
 
-.default-container header div {
+.default-container .sub-header div {
     flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 15px;
+    justify-content: center;
+    padding: 1rem;
 }
 
-.default-container header div span {
+.default-container .sub-header div span {
     font-size: 20px;
-    font-weight: bold;
-    color: #322a40;
+    font-weight: 700;
 }
 
-.default-container header div img {
+.default-container .sub-header div img {
     width: 200px;
 }
 
-.default-container header div + div {
+.default-container .sub-header div + div {
     align-items: flex-end;
 }
 
 .button {
     max-width: 300px;
-    margin-top: 30px;
-    margin-right: 25px;
 }
 
-/* FIM DO HEADER E MENU */
+.default-container .grid-screens {
+    width: 100%;
+    padding: 2rem 0rem 2rem 0rem;
+    
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+.default-container .grid-screens .box-content {
+    height: 19.2rem;
+    background: rgb(224, 32, 65);
+    border-radius: 6px 6px 0px 0px;
+    box-shadow: 0px 0px 10px 0px #c5c5c5;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.default-container .grid-screens .box-content button {
+    border: none;
+    background: transparent;
+}
+
+.default-container .grid-screens .box-content img {
+    width: 100%;
+}
+
+.default-container .grid-screens .box-content h1 {
+    color: #FFF;
+} 
+
+#form {
+    width: 84%;
+    
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+#form input + input {
+    margin-top: 0.8rem;
+    margin-bottom: 0.4rem;
+}
+
+#form .button {
+    box-shadow: 0px 0px 3px 0.1px #ffffff;
+}
+
+.default-container .grid-screens .box-content > div {
+    width: 100%;
+    background: #FFF;
+    height: 85%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
 @media (max-width: 900px) {
 
-    .default-container header {
+    .default-container .sub-header {
         display: flex;
         flex-direction: column;
         align-items: center;

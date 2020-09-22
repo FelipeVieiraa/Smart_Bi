@@ -1,16 +1,24 @@
 @import url('https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap');
 
+#root {
+    width: 95%;
+    margin: 0 auto;
+}
+
+body {
+    width: 100vw;
+    height: 100vh;
+    font: 400 14px Roboto, sans-serif;
+    color: #333;
+    background: #fbfbfb;
+    -webkit-font-smoothing: antialiased;
+}
+
 * {
     margin: 0;
     padding: 0;
     outline: 0;
     box-sizing: 0;
-}
-
-body {
-    font: 400 14px Roboto, sans-serif;
-    background: #fbfbfb;
-    -webkit-font-smoothing: antialiased;
 }
 
 table {
@@ -66,8 +74,4 @@ form select {
 
 .button:hover {
     background:#ff284de0;
-}
-
-.BoxA:hover {
-    opacity: 0.8;
 }

@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import { FiLogIn } from 'react-icons/fi';
+
+import { AuthContext } from '../../contexts/auth';
 
 import api from '../../services/api';
 
@@ -19,24 +21,13 @@ export default function Logon() {
     const [ password, setPassword ] = useState('');
     const [ iduser, setIduser ] = useState('');
 
-    const data = {
-        username,
-        password
-    };
+    const { signIn } = useContext(AuthContext);
 
-    async function logIn(e) {
+
+    async function handleLogin(e) {
         e.preventDefault();
-        
-        try{
-            await api.post("logon", data).then(res => console.log(res.data[0].username));
 
-            localStorage.setItem('name', username);
-            localStorage.setItem('idUser', 1);
-
-            return history.push('/default'); 
-        }catch{
-            alert('Dados incorretos, tente novamente!');
-        }
+        signIn(username, password, history);
         
     }
 
@@ -45,19 +36,21 @@ export default function Logon() {
             <section className="form-content">
                 <img src={logoImg} alt="smart" />
 
-                <form onSubmit={ logIn }>
+                <form onSubmit={ handleLogin }>
                     <h1>Faça seu logon</h1>
 
                     <input
                         placeholder="Usuário"
                         value={username}
                         onChange={ e => setUsername(e.target.value) }
+                        required
                     />
                     <input
                         placeholder="Senha"
                         value={password}
                         type="password"
                         onChange={ e => setPassword(e.target.value) }
+                        required
                     />
 
                     <button className="button" type="submit">Entrar</button>

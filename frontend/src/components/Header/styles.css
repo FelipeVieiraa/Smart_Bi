@@ -1,0 +1,51 @@
+.header-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.header-container div {
+    flex: 1;
+}
+
+.header-container div + div {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    padding: 0 1.5rem 0 1.5rem;
+}
+
+.header-container div button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    height: 3rem;
+    background: transparent;
+    border: none;
+}
+
+.header-container div div {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.header-container div div p {
+    background: chartreuse;
+    width: 0.65rem;
+    height: 0.65rem;
+    border-radius: 100%;
+    margin-right: 0.3rem;
+    cursor: pointer;
+}
+
+.header-container div div label {
+    font-size: 0.9rem;
+    margin-right: 0.3rem;
+}
+
+.header-container div div strong {
+    font-size: 1.1rem;
+}

@@ -1,4 +1,4 @@
-const runServer = require('./server').runServer;
+const runServer = require('./server');
 const routes = require('./routes');
 const testeConnection = require('./database/connection');
 
